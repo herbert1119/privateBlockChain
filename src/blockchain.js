@@ -68,16 +68,17 @@ class Blockchain {
             self.height += 1;
             block.time = Date.now();
             block.height = self.height;
-            
+
             if (previousHeight > -1) {
                 let previousHeight = self.height - 1;
                 let previousBlock = self.chain[previousHeight];
                 block.previousBlockHash = previousBlock.hash;
             }
-            let hash = await block.hashBlock()
-            block.hash = hash
-           self.chain.push(block);
-           resolve(block);
+
+            let hash = await block.hashBlock();
+            block.hash = hash;
+            self.chain.push(block);
+            resolve(block);
         });
     }
 
@@ -120,21 +121,18 @@ class Blockchain {
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
             
             if ((currentTime - timeFromMessage)/60 < 5) {
-                reject("Less than 5 mins");
-                return;
+                return reject("Less than 5 mins");
             }
             
             let starString = JSON.stringify(star);
             
-
             if (!bitcoinMessage.verify(message, address, signature)) {
-                reject("Verification failed");
-                return;
+                return reject("Verification failed");
             }
 
             let messageWithStar = `${message}:${starString}`;
             let block = new BlockClass.Block({data: messageWithStar});
-            let blockAdded = await this._addBlock(block);
+            let blockAdded = await self._addBlock(block);
             resolve(blockAdded)
         });
     }
@@ -150,11 +148,9 @@ class Blockchain {
         return new Promise((resolve, reject) => {
             self.chain.forEach(function(block){
                 if (block.hash === hash) {
-                    resolve(block);
-                    return;
+                    return resolve(block);
                 } else {
-                    reject("not found");
-                    return;
+                    return reject("not found");
                 }
             });
         });
@@ -192,8 +188,10 @@ class Blockchain {
                 if (blockData === null) {
                     return resolve(stars);
                 }
+
                 let blockBody = blockData.data.split(':')
                 let blockAddress = blockBody[0];
+                
                 if (address === blockAddress) {
                     let starData = blockData.data.split('starRegistry:')[1];
                     let decodedStar = JSON.parse(starData);
