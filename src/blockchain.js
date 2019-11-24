@@ -120,7 +120,7 @@ class Blockchain {
             let timeFromMessage = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
             
-            if ((currentTime - timeFromMessage)/60 < 5) {
+            if ((currentTime - timeFromMessage)/60 > 5) {
                 return reject("Less than 5 mins");
             }
             
@@ -215,9 +215,9 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             var storedPreviousBlockHash = "";
             let reversedChain = self.chain.reverse();
-            let test = [1,2,3];
+            
             for (var i=0; i<reversedChain.length; i++) {
-                let block = reversedChain[0]
+                let block = reversedChain[i]
                 if (storedPreviousBlockHash !== "" && block.hash !== storedPreviousBlockHash) {
                     errorLog.push[`Height: ${block.height} is broken: ${block.hash} not match next block: ${storedPreviousBlockHash}`];
                 }
